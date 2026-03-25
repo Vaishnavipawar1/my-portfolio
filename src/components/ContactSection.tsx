@@ -3,22 +3,53 @@ import { useRef, useState } from "react";
 import { Mail, Phone, Linkedin, Github, Send, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
+const WEB3FORMS_KEY = "2151d973-d386-424d-bda1-061a5907857b";
+
 const ContactSection = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
       toast.error("Please fill all fields");
       return;
     }
-    setSubmitted(true);
-    toast.success("Message sent successfully!");
-    setForm({ name: "", email: "", message: "" });
-    setTimeout(() => setSubmitted(false), 3000);
+
+    setLoading(true);
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          name: form.name,
+          email: form.email,
+          message: form.message,
+          subject: "Portfolio Contact Form",
+          from_name: "Vaishnavi Pawar Portfolio",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message || "Failed to send message");
+      }
+
+      setSubmitted(true);
+      toast.success("Message sent successfully!");
+      setForm({ name: "", email: "", message: "" });
+      setTimeout(() => setSubmitted(false), 3000);
+    } catch (err) {
+      toast.error("Could not send message. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -133,13 +164,16 @@ const ContactSection = () => {
             />
             <button
               type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-display font-semibold text-primary-foreground transition-all hover:scale-[1.02]"
+              disabled={loading}
+              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-display font-semibold text-primary-foreground transition-all hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed"
               style={{ background: "var(--gradient-primary)" }}
             >
               {submitted ? (
                 <>
                   <CheckCircle size={18} /> Sent!
                 </>
+              ) : loading ? (
+                <>Sending...</>
               ) : (
                 <>
                   <Send size={18} /> Send Message
