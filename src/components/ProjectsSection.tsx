@@ -25,6 +25,10 @@ const projects = [
 ];
 
 const liveProjects = [
+  { name: "Sandi's Tours & Travels", href: "https://sandis.com/" },
+  { name: "Vighnaharata Extrustion", href: "https://vighnahartaextrusion.com/" },
+  { name: "Praavi Consultants", href: "https://www.praaviconsultants.in/" },
+  { name: "Yash Industries", href: "https://yashpoles.in/" },
   { name: "RMK Enterprises", href: "https://rmkenterprises.in/" },
   { name: "RealTrips", href: "https://realtrips.in/" },
   { name: "Sky Hostel", href: "https://skyhostels.in/" },
